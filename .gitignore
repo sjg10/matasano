@@ -1,0 +1,6 @@
+bin_*/
+obj_*/
+.settings/
+.project
+.cproject
+*~
