@@ -19,6 +19,7 @@ EXECUTABLE = $(BIN_DIR)/matasano
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h)
 SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJ_DIR)/%.o)
+MAGIC_HEADER = $(INCLUDE_DIR)/magic.h
 DEPS = $(OBJECTS:.o=.d)
 
 # Phony Targets
@@ -40,10 +41,13 @@ $(EXECUTABLE): $(OBJECTS)
 	@echo "Done.\n"
 
 #TODO: can the pattern matching look nicer?
-$(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.c
+$(OBJ_DIR)/%.o: $(SOURCE_DIR)/%.c $(MAGIC_HEADER)
 	@echo "Compiling $< ..."
 	$(CC) $(CCFLAGS) $< -o $@
 	@echo "Done.\n"
+
+$(MAGIC_HEADER): create_magic_header.py
+	python create_magic_header.py
 
 $(OBJ_DIR) $(BIN_DIR):
 	@echo "Creating output folder..."

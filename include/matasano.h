@@ -14,16 +14,15 @@
 #define PASS 0
 #define FAIL !PASS
 
+// Update on new challenge set to create new magic.h
 #define NUMBER_OF_CHALLENGE_SETS 1
 
 typedef int bool;
 
+// This provides the function declerations needed for the array
+// And the setup_function_array to set up the array
 bool (*challenge_set_run[NUMBER_OF_CHALLENGE_SETS])(void);
-
-//TODO: find something nicer, use it within sets as well.
-bool challenge_main_set_one(void);
-#define setup_function_array() \
-		challenge_set_run[0] = challenge_main_set_one;
+#include "magic.h"
 
 
 #endif /* MATASANO_H_ */
