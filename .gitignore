@@ -1,5 +1,5 @@
-bin_*/
-obj_*/
+bin/
+obj/
 .settings/
 .project
 .cproject
