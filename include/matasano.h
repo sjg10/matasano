@@ -7,11 +7,15 @@
 
 #ifndef MATASANO_H_
 #define MATASANO_H_
-
+#define __STDC_FORMAT_MACROS
 #include <stdio.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
+typedef uint64_t UINT64;
+typedef uint32_t UINT32;
 #define PASS 0
 #define FAIL !PASS
 
