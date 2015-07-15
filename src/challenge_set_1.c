@@ -11,13 +11,18 @@ UINT64 _hex_to_int_15digits(char* in)
     return (UINT64) strtoull(temp, NULL, 16);
 }
 
-//TODO: doesnt work, test and fix
+//TODO: test, then remove printfs
 bool _int_to_base64_10digits(UINT64 in, char* out)
 {
     int i;
-    memset(out, 10, '.');
+    char* dict = DICTBASE64;
+    memset(out, '.', 10);
     out[10] = '\0';
-    for(i = 10; i >=0; i--, in <<= 6) out[i] = in % 64;
+    printf("out_init=%s\n",out);
+    for(i = 9; i >=0; i--, in >>= 6)
+    {
+        out[i] = dict[in % 64]; printf("i: %d, in: %ull %s\n",i,in,out);
+    }
     return PASS;
 }
 
