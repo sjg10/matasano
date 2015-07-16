@@ -19,6 +19,7 @@ typedef uint64_t UINT64;
 typedef uint32_t UINT32;
 #define PASS 0
 #define FAIL !PASS
+#define MIN(a,b) ( (a < b) ? (a) : (b) )
 
 // Update on new challenge set to create new magic.h
 #define NUMBER_OF_CHALLENGE_SETS 1

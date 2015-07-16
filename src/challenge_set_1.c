@@ -45,6 +45,24 @@ bool hex_to_base64(char* in, char* out, int max_output_length)
     return PASS;
 }
 
+bool fixed_xor(char* in1, char* in2, char* out)
+{
+    int i;
+    int len = strlen(in1);
+    char temp;
+    char* last_char;
+    //TODO this just takes in1 as int 15 dig at a time, need to xor them!
+    //TODO last guy needs to be shifted to the left!
+    for (i = 0; i < len; i += 15) 
+    {
+        last_char = (in1 + i + MIN(16, len - i + 1));
+        temp = *last_char; *last_char = '\0';
+        printf("%016llX\n",strtoull(in1 + i, NULL, 16)); sprintf(out + i, "%016llX",strtoull(in1 + i,NULL,16));
+        *last_char = temp;
+    }
+    return PASS;
+}
+
 bool challenge_main_set_1(void)
 {
 	bool result;
@@ -58,6 +76,15 @@ bool challenge_main_set_1(void)
     hex_to_base64(hex_string, temp, 100);
     result = (PASS == !strcmp(base64_string, temp));
     CHECK_CHALLENGE(1, result);
+
+    // Challenge 2:
+    char xor_str_one[100]   = "1c0111001f010100061a024b53535009181c";
+    char xor_str_two[100]   = "686974207468652062756c6c277320657965";
+    char xor_str_three[100] = "746865206b696420646f6e277420706c6179";
+    fixed_xor(xor_str_one, xor_str_two, temp);
+    result = (PASS == !strcmp(xor_str_three, temp);
+    printf("%s\n",temp);
+    CHECK_CHALLENGE(2, result);
 
 	return PASS;
 }
