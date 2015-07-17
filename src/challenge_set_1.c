@@ -45,21 +45,41 @@ bool hex_to_base64(char* in, char* out, int max_output_length)
     return PASS;
 }
 
-bool fixed_xor(char* in1, char* in2, char* out)
+// Takes an array of (number_of_inputs) hex strings of same length,
+// returns out string of same length of their xor'd value
+bool fixed_xor(char** in, int number_of_inputs, char* out)
 {
-    int i;
-    int len = strlen(in1);
-    char temp;
-    char* last_char;
-    //TODO this just takes in1 as int 15 dig at a time, need to xor them!
-    //TODO last guy needs to be shifted to the left!
-    for (i = 0; i < len; i += 15) 
+    int i, j;
+    UINT64 temp_int;
+    int len          = strlen(in[0]);
+    char* temp       = (char*) malloc(number_of_inputs * sizeof(char));
+    // create temp_out that can include extra zero padding if (len % 16) != 0
+    char* temp_out   = (char*) malloc((len + (16 - len % 16) + 1) * sizeof(char));
+    char** last_char = (char**) malloc(number_of_inputs * sizeof(char*));
+    // We proceed in lots of UINT64s (16 digits) to be efficient.
+    for (i = 0; i < len; i += 16) 
     {
-        last_char = (in1 + i + MIN(16, len - i + 1));
-        temp = *last_char; *last_char = '\0';
-        printf("%016llX\n",strtoull(in1 + i, NULL, 16)); sprintf(out + i, "%016llX",strtoull(in1 + i,NULL,16));
-        *last_char = temp;
+        temp_int = 0;
+        for (j = 0 ; j < number_of_inputs; j ++)
+        {
+            last_char[j] = (in[j] + i + MIN(16, len - i + 1));
+            temp[j] = *(last_char[j]); *(last_char[j]) = '\0';
+            temp_int ^= strtoull(in[j] + i, NULL, 16);
+            *(last_char[j]) = temp[j];
+        }
+        sprintf(temp_out + i, "%016llx", (long long int) temp_int);
     }
+
+    if(len % 16 != 0)
+    {
+        // Rewrite final block to remove leading zeros
+        strcpy(temp_out + i - 16, temp_out + i - (len % 16));
+    }
+    strcpy(out, temp_out);
+
+    free (temp_out);
+    free (temp);
+    free (last_char);
     return PASS;
 }
 
@@ -80,10 +100,10 @@ bool challenge_main_set_1(void)
     // Challenge 2:
     char xor_str_one[100]   = "1c0111001f010100061a024b53535009181c";
     char xor_str_two[100]   = "686974207468652062756c6c277320657965";
+    char* xor_strs[2] = {xor_str_one, xor_str_two};
     char xor_str_three[100] = "746865206b696420646f6e277420706c6179";
-    fixed_xor(xor_str_one, xor_str_two, temp);
-    result = (PASS == !strcmp(xor_str_three, temp);
-    printf("%s\n",temp);
+    fixed_xor(xor_strs, 2, temp);
+    result = (PASS == !strcmp(xor_str_three, temp));
     CHECK_CHALLENGE(2, result);
 
 	return PASS;
