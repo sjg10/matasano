@@ -2,6 +2,7 @@
 #include <ctype.h>
 #define DICTBASE64 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 #define BASE64_0   'A'
+//TODO tidy!
 
 double char_freqs[] = {
 0.08167,
@@ -33,7 +34,6 @@ double char_freqs[] = {
 
 double get_char_std_freq(char c)
 {
-    
     return char_freqs[tolower(c) - 'a'];
 }
 
@@ -59,11 +59,13 @@ bool hex_to_ascii_str(char* in, char* out)
     int len = strlen(in);
     char temp[3];
     temp[2] = '\0';
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; i += 2)
     {
-        memcpy(temp, out + i, 2);
-        out[i] = (char) strtol(temp, NULL, 16);
+        memcpy(temp, in + i, 2);
+        out[i / 2] = (char) strtol(temp, NULL, 16);
+//        printf("%s - %02x \n",temp,out[i]);
     }
+    out[i/2 - 1] - '\0';
     return PASS;
 }
 
@@ -149,7 +151,7 @@ bool fixed_xor(char** in, int number_of_inputs, char* out)
     return PASS;
 }
 
-
+//works
 bool ascii_str_to_hex(char* in, char* out)
 {
     int i;
@@ -157,27 +159,42 @@ bool ascii_str_to_hex(char* in, char* out)
     for(i =0; i < len; i++) sprintf(out + (i*2),"%02x",in[i]);
     return PASS;
 }
+
+
+//TODO: gives a solution, but is short (misses chars, possibly
+// due to non - text chars intefering. Sort it!
 bool decode_xord_hex_string(char* in, char* out)
 {
     char c;
+    double temp_weight;
+    double best_weight = 0;
     int len = strlen(in);
+//    printf("LEN: %d\n",len);
     char* key = (char*) malloc((len + 1) * sizeof(char));
     char* key_temp = (char*) malloc(((len / 2) + 1) * sizeof(char));
-    char* temp = (char*) malloc((len + 1) * sizeof(char));
+    char* temp_one = (char*) malloc((len + 1) * sizeof(char));
+    char* temp_two = (char*) malloc((len + 1) * sizeof(char));
     key_temp[len / 2] = '\0';
     char* strings[2] = {in, key};
     for ( c = 'a'; c <= 'z'; c++)
     {
         memset(key_temp, c, len / 2);
         ascii_str_to_hex(key_temp, key);
-        printf("%s\n",key);
-        fixed_xor(strings, 2, temp);
-        hex_to_ascii_str(temp, out);
-        printf("%c %f: %s\n",c,char_freq_weight(out),out);
-
+        fixed_xor(strings, 2, temp_one);
+        hex_to_ascii_str(temp_one, temp_two);
+        temp_weight = char_freq_weight(temp_two);
+//        printf("%c (%f) %s\n", c, temp_weight, temp_two);
+        if (temp_weight > best_weight)
+        {
+//            printf("NEW\n");
+            strcpy(out, temp_two);
+            best_weight = temp_weight;
+        }
     }
     free (key);
-    free (temp);
+    free (temp_one);
+    free (temp_two);
+    free (key_temp);
     return PASS;
 }
 
@@ -208,6 +225,7 @@ bool challenge_main_set_1(void)
     char xord_string[100] = "1b37373331363f78151b7f2b783431333d78397828372d363c"
                             "78373e783a393b3736";
     decode_xord_hex_string(xord_string, temp);
+    printf("Challenge three result = %s\n", temp);
 
 	return PASS;
 }
