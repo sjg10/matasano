@@ -1,7 +1,73 @@
 #include "matasano.h"
-
+#include <ctype.h>
 #define DICTBASE64 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 #define BASE64_0   'A'
+
+double char_freqs[] = {
+0.08167,
+0.01492,
+0.02782,
+0.04253,
+0.12702,
+0.02228,
+0.02015,
+0.06094,
+0.06966,
+0.00153,
+0.00772,
+0.04025,
+0.02406,
+0.06749,
+0.07507,
+0.01929,
+0.00095,
+0.05987,
+0.06327,
+0.09056,
+0.02758,
+0.00978,
+0.02361,
+0.00150,
+0.01974,
+0.00074};
+
+double get_char_std_freq(char c)
+{
+    
+    return char_freqs[tolower(c) - 'a'];
+}
+
+double char_freq_weight(char* in)
+{
+    char c;
+    char* s;
+    int i;
+    double sum = 0;
+    double len = (double) strlen(in);
+    for ( c = 'a'; c <= 'z'; c++)
+    {
+        s = in;
+        for (i = 0; s[i]; (tolower(s[i]) == c) ? i++ : *s++);
+        sum += pow((i / len) - (get_char_std_freq(c)), 2);
+    }
+    return sqrt(sum);
+}
+
+bool hex_to_ascii_str(char* in, char* out)
+{
+    int i;
+    int len = strlen(in);
+    char temp[3];
+    temp[2] = '\0';
+    for (i = 0; i < len; i++)
+    {
+        memcpy(temp, out + i, 2);
+        out[i] = (char) strtol(temp, NULL, 16);
+    }
+    return PASS;
+}
+
+
 // TODO: For now functions DO NOT do input checks.
 
 // (Private) Takes a <=15 char hex string and returns UINT64 of its value
@@ -83,6 +149,38 @@ bool fixed_xor(char** in, int number_of_inputs, char* out)
     return PASS;
 }
 
+
+bool ascii_str_to_hex(char* in, char* out)
+{
+    int i;
+    int len = strlen(in);
+    for(i =0; i < len; i++) sprintf(out + (i*2),"%02x",in[i]);
+    return PASS;
+}
+bool decode_xord_hex_string(char* in, char* out)
+{
+    char c;
+    int len = strlen(in);
+    char* key = (char*) malloc((len + 1) * sizeof(char));
+    char* key_temp = (char*) malloc(((len / 2) + 1) * sizeof(char));
+    char* temp = (char*) malloc((len + 1) * sizeof(char));
+    key_temp[len / 2] = '\0';
+    char* strings[2] = {in, key};
+    for ( c = 'a'; c <= 'z'; c++)
+    {
+        memset(key_temp, c, len / 2);
+        ascii_str_to_hex(key_temp, key);
+        printf("%s\n",key);
+        fixed_xor(strings, 2, temp);
+        hex_to_ascii_str(temp, out);
+        printf("%c %f: %s\n",c,char_freq_weight(out),out);
+
+    }
+    free (key);
+    free (temp);
+    return PASS;
+}
+
 bool challenge_main_set_1(void)
 {
 	bool result;
@@ -105,6 +203,11 @@ bool challenge_main_set_1(void)
     fixed_xor(xor_strs, 2, temp);
     result = (PASS == !strcmp(xor_str_three, temp));
     CHECK_CHALLENGE(2, result);
+
+    // Challenge 3:
+    char xord_string[100] = "1b37373331363f78151b7f2b783431333d78397828372d363c"
+                            "78373e783a393b3736";
+    decode_xord_hex_string(xord_string, temp);
 
 	return PASS;
 }

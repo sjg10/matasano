@@ -13,6 +13,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 
 typedef uint64_t UINT64;

@@ -3,7 +3,7 @@ CC = gcc
 CCFLAGS = -c -Wall $(addprefix -D,$(DEFINES)) -I$(INCLUDE_DIR) $(MAKEFILE_DEPS_FLAGS)
 MAKEFILE_DEPS_FLAGS = -MMD -MP
 DEFINES =
-LDFLAGS =
+LDFLAGS = -lm
 
 # Helper programs
 MKDIR_P = mkdir -p
