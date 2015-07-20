@@ -34,22 +34,25 @@ double char_freqs[] = {
 
 double get_char_std_freq(char c)
 {
-    return char_freqs[tolower(c) - 'a'];
+    return char_freqs[toupper(c) - 'A'];
 }
 
 double char_freq_weight(char* in)
 {
     char c;
-    char* s;
+    char* s = in;
     int i;
     double sum = 0;
     double len = (double) strlen(in);
-    for ( c = 'a'; c <= 'z'; c++)
+    int non_text_chars = len;
+    for ( c = 'A'; c <= 'Z'; c++)
     {
         s = in;
-        for (i = 0; s[i]; (tolower(s[i]) == c) ? i++ : *s++);
+        for (i = 0; s[i]; (toupper(s[i]) == c) ? (i++,non_text_chars--) : *s++);
         sum += pow((i / len) - (get_char_std_freq(c)), 2);
     }
+    // TODO, you might want an expected value of this computed by usual punc/space frequency.
+    sum += pow(non_text_chars / (double) len, 2);
     return sqrt(sum);
 }
 
@@ -161,13 +164,11 @@ bool ascii_str_to_hex(char* in, char* out)
 }
 
 
-//TODO: gives a solution, but is short (misses chars, possibly
-// due to non - text chars intefering. Sort it!
 bool decode_xord_hex_string(char* in, char* out)
 {
     char c;
     double temp_weight;
-    double best_weight = 0;
+    double best_weight = 26;
     int len = strlen(in);
 //    printf("LEN: %d\n",len);
     char* key = (char*) malloc((len + 1) * sizeof(char));
@@ -176,17 +177,17 @@ bool decode_xord_hex_string(char* in, char* out)
     char* temp_two = (char*) malloc((len + 1) * sizeof(char));
     key_temp[len / 2] = '\0';
     char* strings[2] = {in, key};
-    for ( c = 'a'; c <= 'z'; c++)
+    for ( c = 'A'; c <= 'Z'; c++)
     {
         memset(key_temp, c, len / 2);
         ascii_str_to_hex(key_temp, key);
         fixed_xor(strings, 2, temp_one);
         hex_to_ascii_str(temp_one, temp_two);
         temp_weight = char_freq_weight(temp_two);
-//        printf("%c (%f) %s\n", c, temp_weight, temp_two);
-        if (temp_weight > best_weight)
+        //printf("%c (%f) %s\n", c, temp_weight, temp_two);
+        if (temp_weight < best_weight)
         {
-//            printf("NEW\n");
+        //    printf("NEW\n");
             strcpy(out, temp_two);
             best_weight = temp_weight;
         }
@@ -225,7 +226,7 @@ bool challenge_main_set_1(void)
     char xord_string[100] = "1b37373331363f78151b7f2b783431333d78397828372d363c"
                             "78373e783a393b3736";
     decode_xord_hex_string(xord_string, temp);
-    printf("Challenge three result = %s\n", temp);
+    printf("Challenge three result = \"%s\"\n", temp);
 
 	return PASS;
 }
