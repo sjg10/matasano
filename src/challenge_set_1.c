@@ -2,8 +2,9 @@
 #include <ctype.h>
 #define DICTBASE64 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 #define BASE64_0   'A'
+#define REMOVE_NEWLINE(str) do{ str[strcspn(str, "\r\n")] = 0;} while(0);
 //TODO tidy!
-
+#include <unistd.h>
 double char_freqs[] = {
 0.08167,
 0.01492,
@@ -164,7 +165,7 @@ bool ascii_str_to_hex(char* in, char* out)
 }
 
 
-bool decode_xord_hex_string(char* in, char* out)
+double decode_xord_hex_string(char* in, char* out)
 {
     char c;
     double temp_weight;
@@ -196,6 +197,32 @@ bool decode_xord_hex_string(char* in, char* out)
     free (temp_one);
     free (temp_two);
     free (key_temp);
+    return best_weight;
+}
+
+//TODO: debug, doesn't return english (maybe needs better weight function)
+bool decode_xord_hex_str_file(FILE * handle, char* out)
+{
+    char line[100];
+    char temp[100];
+    double temp_weight;
+    double best_weight = 26;
+    while (fgets(line, sizeof(line), handle))
+    {
+        printf(line);
+        size_t len = strlen(line);
+        if (len && (line[len - 1] != '\n'))
+        {
+            return FAIL;
+        }
+        REMOVE_NEWLINE(line);
+        temp_weight = decode_xord_hex_string(line, temp);
+        if (temp_weight < best_weight)
+        {
+            strcpy(out, temp);
+            best_weight = temp_weight;
+        }
+    }
     return PASS;
 }
 
@@ -227,6 +254,19 @@ bool challenge_main_set_1(void)
                             "78373e783a393b3736";
     decode_xord_hex_string(xord_string, temp);
     printf("Challenge three result = \"%s\"\n", temp);
+
+    // Challenge 4:
+    FILE * file_4;
+    if ((file_4 = fopen("../res/4.txt", "r")) == NULL)
+    {
+        printf("Error: File cannot be opened\n");
+        return FAIL;
+    }
+    //TODO: might fail due to running in wrong folder, fix!
+    file_4 = fopen("../res/4.txt","r");
+    decode_xord_hex_str_file(file_4, temp);
+    printf("Challenge four result = \"%s\"\n", temp);
+    fclose(file_4);
 
 	return PASS;
 }
