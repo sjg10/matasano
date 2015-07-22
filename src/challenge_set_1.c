@@ -6,36 +6,29 @@
 //TODO tidy!
 #include <unistd.h>
 double char_freqs[] = {
-0.08167,
-0.01492,
-0.02782,
-0.04253,
-0.12702,
-0.02228,
-0.02015,
-0.06094,
-0.06966,
-0.00153,
-0.00772,
-0.04025,
-0.02406,
-0.06749,
-0.07507,
-0.01929,
-0.00095,
-0.05987,
-0.06327,
-0.09056,
-0.02758,
-0.00978,
-0.02361,
-0.00150,
-0.01974,
-0.00074};
+0.0651738,0.0124248,0.0217339,0.0349835,0.1041442,0.0197881,0.0158610,0.0492888,0.0558094,0.0009033,0.0050529,0.0331490,0.0202124,0.0564513,0.0596302,0.0137645,0.0008606,0.0497563,0.0515760,0.0729357,0.0225134,0.0082903,0.0171272,0.0013692,0.0145984,0.0007836,0.1918182
+};
 
 double get_char_std_freq(char c)
 {
-    return char_freqs[toupper(c) - 'A'];
+    double ret_val;
+    if (c == ' ')
+    {
+        ret_val = char_freqs[26];
+    }
+    else
+    {
+        char temp_c = toupper(c);
+        if (temp_c <= 'A' || temp_c > 'Z')
+        {
+            ret_val = 0;
+        }
+        else
+        {
+            ret_val = char_freqs[temp_c - 'A'];
+        }
+    }
+    return ret_val;
 }
 
 double char_freq_weight(char* in)
@@ -45,15 +38,16 @@ double char_freq_weight(char* in)
     int i;
     double sum = 0;
     double len = (double) strlen(in);
-    int non_text_chars = len;
     for ( c = 'A'; c <= 'Z'; c++)
     {
         s = in;
-        for (i = 0; s[i]; (toupper(s[i]) == c) ? (i++,non_text_chars--) : *s++);
+        for (i = 0; s[i]; (toupper(s[i]) == c) ? i++ : *s++);
         sum += pow((i / len) - (get_char_std_freq(c)), 2);
     }
-    // TODO, you might want an expected value of this computed by usual punc/space frequency.
-    sum += pow(non_text_chars / (double) len, 2);
+    s = in;
+    c = ' ';
+    for (i = 0; s[i]; (toupper(s[i]) == c) ? i++ : *s++);
+    sum += pow((i / len) - (get_char_std_freq(c)), 2);
     return sqrt(sum);
 }
 
@@ -209,7 +203,6 @@ bool decode_xord_hex_str_file(FILE * handle, char* out)
     double best_weight = 26;
     while (fgets(line, sizeof(line), handle))
     {
-        printf(line);
         size_t len = strlen(line);
         if (len && (line[len - 1] != '\n'))
         {
@@ -217,8 +210,10 @@ bool decode_xord_hex_str_file(FILE * handle, char* out)
         }
         REMOVE_NEWLINE(line);
         temp_weight = decode_xord_hex_string(line, temp);
+        printf("(%f) %s\n",temp_weight,temp);
         if (temp_weight < best_weight)
         {
+            printf("NEW\n");
             strcpy(out, temp);
             best_weight = temp_weight;
         }
@@ -257,13 +252,12 @@ bool challenge_main_set_1(void)
 
     // Challenge 4:
     FILE * file_4;
-    if ((file_4 = fopen("../res/4.txt", "r")) == NULL)
+    if ( (file_4 = fopen("../res/4.txt", "r")) == NULL && ((file_4 = fopen("./res/4.txt", "r")) == NULL))
     {
         printf("Error: File cannot be opened\n");
         return FAIL;
     }
     //TODO: might fail due to running in wrong folder, fix!
-    file_4 = fopen("../res/4.txt","r");
     decode_xord_hex_str_file(file_4, temp);
     printf("Challenge four result = \"%s\"\n", temp);
     fclose(file_4);
