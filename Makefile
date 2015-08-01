@@ -1,6 +1,6 @@
 # Compiler definitions
 CC = gcc
-CCFLAGS = -c -Wall $(addprefix -D,$(DEFINES)) -I$(INCLUDE_DIR) $(MAKEFILE_DEPS_FLAGS)
+CCFLAGS = -c -Wall -funsigned-char $(addprefix -D,$(DEFINES)) -I$(INCLUDE_DIR) $(MAKEFILE_DEPS_FLAGS)
 MAKEFILE_DEPS_FLAGS = -MMD -MP
 DEFINES =
 LDFLAGS = -lm
