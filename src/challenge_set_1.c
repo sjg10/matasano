@@ -38,16 +38,27 @@ double char_freq_weight(char* in)
     int i;
     double sum = 0;
     double len = (double) strlen(in);
-    for ( c = 'A'; c <= 'Z'; c++)
+    
+    // Check as not good if not printable ascii!
+    for (i = 0; s[i]; i++) {if(!isprint(s[i])) {len = 0; break;} };
+    
+    if(len > 0)
     {
+        for ( c = 'A'; c <= 'Z'; c++)
+        {
+            s = in;
+            for (i = 0; s[i]; (toupper(s[i]) == c) ? i++ : *s++);
+            sum += pow((i / len) - (get_char_std_freq(c)), 2);
+        }
         s = in;
+        c = ' ';
         for (i = 0; s[i]; (toupper(s[i]) == c) ? i++ : *s++);
         sum += pow((i / len) - (get_char_std_freq(c)), 2);
     }
-    s = in;
-    c = ' ';
-    for (i = 0; s[i]; (toupper(s[i]) == c) ? i++ : *s++);
-    sum += pow((i / len) - (get_char_std_freq(c)), 2);
+    else
+    {
+        sum = 1;
+    }
     return sqrt(sum);
 }
 
@@ -60,10 +71,10 @@ bool hex_to_ascii_str(char* in, char* out)
     for (i = 0; i < len; i += 2)
     {
         memcpy(temp, in + i, 2);
-        out[i / 2] = (char) strtol(temp, NULL, 16);
-//        printf("%s - %02x \n",temp,out[i]);
+        out[i / 2] = strtoul(temp, NULL, 16);
     }
-    out[i/2 - 1] - '\0';
+    out[i / 2] = '\0';
+
     return PASS;
 }
 
@@ -158,6 +169,28 @@ bool ascii_str_to_hex(char* in, char* out)
     return PASS;
 }
 
+// Returns english weight of resultant
+double xor_hexstr_with_char(char key, char* in, char* out_hex, char* out_asc)
+{
+    int len = strlen(in);
+    double weight;
+    char* key_hex = (char*) malloc((len + 1) * sizeof(char));
+    char* key_asc = (char*) malloc(((len / 2) + 1) * sizeof(char));
+
+    memset(key_asc, key, len / 2);
+    ascii_str_to_hex(key_asc, key_hex);
+
+    char* strings[] = {in, key_hex};
+    fixed_xor(strings, 2, out_hex);
+
+    hex_to_ascii_str(out_hex, out_asc);
+    weight = char_freq_weight(out_asc);
+
+    free (key_hex);
+    free (key_asc);
+
+    return weight;
+}
 
 double decode_xord_hex_string(char* in, char* out)
 {
@@ -165,32 +198,26 @@ double decode_xord_hex_string(char* in, char* out)
     double temp_weight;
     double best_weight = 26;
     int len = strlen(in);
-//    printf("LEN: %d\n",len);
-    char* key = (char*) malloc((len + 1) * sizeof(char));
-    char* key_temp = (char*) malloc(((len / 2) + 1) * sizeof(char));
-    char* temp_one = (char*) malloc((len + 1) * sizeof(char));
-    char* temp_two = (char*) malloc((len + 1) * sizeof(char));
-    key_temp[len / 2] = '\0';
-    char* strings[2] = {in, key};
+//    printf("                %s\n",in);
+    char* temp_hex = (char*) malloc((len + 1) * sizeof(char));
+    char* temp_asc = (char*) malloc((len + 1) * sizeof(char));
+
     for ( c = 'A'; c <= 'Z'; c++)
     {
-        memset(key_temp, c, len / 2);
-        ascii_str_to_hex(key_temp, key);
-        fixed_xor(strings, 2, temp_one);
-        hex_to_ascii_str(temp_one, temp_two);
-        temp_weight = char_freq_weight(temp_two);
-        //printf("%c (%f) %s\n", c, temp_weight, temp_two);
+        temp_weight =  xor_hexstr_with_char(c, in, temp_hex, temp_asc);
+        if(temp_weight < 1)
+            printf("%s\n", temp_asc);
+//        printf("%c=%02x (%f) %s%s\n", c,c, temp_weight, temp_hex, temp_asc);
         if (temp_weight < best_weight)
         {
         //    printf("NEW\n");
-            strcpy(out, temp_two);
+            strcpy(out, temp_asc);
             best_weight = temp_weight;
         }
     }
-    free (key);
-    free (temp_one);
-    free (temp_two);
-    free (key_temp);
+
+    free (temp_hex);
+    free (temp_asc);
     return best_weight;
 }
 
@@ -203,17 +230,12 @@ bool decode_xord_hex_str_file(FILE * handle, char* out)
     double best_weight = 26;
     while (fgets(line, sizeof(line), handle))
     {
-        size_t len = strlen(line);
-        if (len && (line[len - 1] != '\n'))
-        {
-            return FAIL;
-        }
         REMOVE_NEWLINE(line);
         temp_weight = decode_xord_hex_string(line, temp);
         printf("(%f) %s\n",temp_weight,temp);
         if (temp_weight < best_weight)
         {
-            printf("NEW\n");
+            //printf("NEW\n");
             strcpy(out, temp);
             best_weight = temp_weight;
         }
