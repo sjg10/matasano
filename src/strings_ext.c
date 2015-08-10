@@ -91,7 +91,7 @@ bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
     for (i = 0; i < number_of_inputs; i++)
     {
         in_safe[i] = malloc(len * sizeof(char));
-        strcpy(in_safe[i], in[i]);
+        strncpy(in_safe[i], in[i], len);
     }
 
     char* temp        = (char*) malloc(number_of_inputs * sizeof(char));
@@ -108,7 +108,7 @@ bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
         temp_int = 0;
         for (j = 0 ; j < number_of_inputs; j ++)
         {
-            last_char[j] = (in_safe[j] + i + MIN(16, len - i + 1));
+            last_char[j] = (in_safe[j] + i + MIN(16, len - i - 1));
             temp[j] = *(last_char[j]); 
             *(last_char[j]) = '\0';
             temp_int ^= strtoull(in_safe[j] + i, NULL, 16);
