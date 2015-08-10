@@ -122,30 +122,50 @@ bool challenge_main_set_1(void)
     CHECK_CHALLENGE(1, result);
     
     // Challenge 2:
-    HEXSTR xor_str_one   = "1c0111001f010100061a024b53535009181c";
-    HEXSTR xor_str_two   = "686974207468652062756c6c277320657965";
-    HEXSTR xor_strs[2] = {xor_str_one, xor_str_two};
-    HEXSTR xor_str_three = "746865206b696420646f6e277420706c6179";
-    xor_hexstrs(xor_strs, 2, temp);
-    result = (PASS == !strcmp(xor_str_three, temp));
-    CHECK_CHALLENGE(2, result);
+    {
+        HEXSTR xor_str_one   = "1c0111001f010100061a024b53535009181c";
+        HEXSTR xor_str_two   = "686974207468652062756c6c277320657965";
+        HEXSTR xor_strs[2] = {xor_str_one, xor_str_two};
+        HEXSTR xor_str_three = "746865206b696420646f6e277420706c6179";
+        xor_hexstrs(xor_strs, 2, temp);
+        result = (PASS == !strcmp(xor_str_three, temp));
+        CHECK_CHALLENGE(2, result);
+    }
 
     // Challenge 3:
-    HEXSTR xord_string = "1b37373331363f78151b7f2b783431333d78397828372d363c"
-                            "78373e783a393b3736";
-    decode_xord_hexstr(xord_string, temp);
-    printf("Challenge 3 result = \"%s\"\n", temp);
+    {
+        HEXSTR xord_string = "1b37373331363f78151b7f2b783431333d78397828372d363c"
+                             "78373e783a393b3736";
+        decode_xord_hexstr(xord_string, temp);
+        printf("Challenge 3 result = \"%s\"\n", temp);
+    }
     
     // Challenge 4:
-    FILE * file_4;
-    if ( (file_4 = fopen("../res/4.txt", "r")) == NULL && ((file_4 = fopen("./res/4.txt", "r")) == NULL))
     {
-        printf("Error: File cannot be opened\n");
-        return FAIL;
+        FILE * file_4;
+        if ( (file_4 = fopen("../res/4.txt", "r")) == NULL && ((file_4 = fopen("./res/4.txt", "r")) == NULL))
+        {
+            printf("Error: File cannot be opened\n");
+            return FAIL;
+        }
+        decode_xord_hexstr_file(file_4, temp);
+        fclose(file_4);
+        printf("Challenge 4 result = \"%s\"\n", temp);
     }
-    decode_xord_hexstr_file(file_4, temp);
-    printf("Challenge 4 result = \"%s\"\n", temp);
-    fclose(file_4);
+
+
+    // Challenge 5:
+    {
+        ASCSTR in_asc = "Burning 'em, if you ain't quick and nimble\n"
+                        "I go crazy when I hear a cymbal";
+        HEXSTR temp_hex = (HEXSTR) malloc((100) * sizeof(char));
+        ascstr_to_hexstr(in_asc, temp_hex);
+        xor_hexstr_with_repeatingkey(temp_hex, "ICE", 3, temp);
+        free(temp_hex);
+        printf("Challenge 5 result = \"%s\"\n", temp);
+    }
+
+
 
 	return PASS;
 }

@@ -13,6 +13,7 @@ bool hexstr_to_ascstr(HEXSTR in, ASCSTR out);
 
 bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out);
 bool xor_hexstr_with_char(HEXSTR in, char key, HEXSTR out_hex);
+bool xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex);
 
 #endif
 

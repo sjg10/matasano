@@ -151,3 +151,28 @@ bool xor_hexstr_with_char(HEXSTR in, char key, HEXSTR out_hex)
 
     return PASS;
 }
+
+//TODO: fix malloc error nightmare!
+//TODO: replace char guy with this
+bool xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex)
+{
+    int i;
+    int len = strlen(in);
+    char* key_hex = (char*) malloc((len + 1) * sizeof(char));
+    char* key_asc = (char*) malloc(((len / 2) + 1) * sizeof(char));
+
+    for(i = 0; i < len / 2; i += key_len)
+    {
+        strncpy(key_asc + i, key, MIN(key_len, (len / 2) - i));
+    }
+    key_asc[len / 2] = '\0';
+    ascstr_to_hexstr(key_asc, key_hex);
+
+    HEXSTR strings[] = {in, key_hex};
+    xor_hexstrs(strings, 2, out_hex);
+    
+    free (key_hex);
+    free (key_asc);
+
+    return PASS;
+}
