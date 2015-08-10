@@ -1,10 +1,9 @@
 #include "matasano.h"
-#include <ctype.h>
-#define DICTBASE64 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-#define REMOVE_NEWLINE(str) do{ str[strcspn(str, "\r\n")] = 0;} while(0);
-//TODO tidy!
-#include "strings_ext.h"
 #include <unistd.h>
+#include <ctype.h>
+#include "strings_ext.h"
+
+#define REMOVE_NEWLINE(str) do{ str[strcspn(str, "\r\n")] = 0;} while(0);
 double char_freqs[] = {
 0.0651738,0.0124248,0.0217339,0.0349835,0.1041442,0.0197881,0.0158610,0.0492888,0.0558094,0.0009033,0.0050529,0.0331490,0.0202124,0.0564513,0.0596302,0.0137645,0.0008606,0.0497563,0.0515760,0.0729357,0.0225134,0.0082903,0.0171272,0.0013692,0.0145984,0.0007836,0.1918182
 };
@@ -38,10 +37,8 @@ double char_freq_weight(ASCSTR in)
     int i;
     double sum = 0;
     double len = (double) strlen(in);
-    
     // Check as not good if not printable ascii!
-    for (i = 0; s[i]; i++) {if(!isprint(s[i])) {len = 0; break;} };
-    
+    //for (i = 0; s[i]; i++) {if(!isprint(s[i]) && s[i] != '\n') {len = 0; break;} }; could be cracked out in future?
     if(len > 0)
     {
         for ( c = 'A'; c <= 'Z'; c++)
@@ -68,7 +65,6 @@ double decode_xord_hexstr(HEXSTR in, ASCSTR out)
     double temp_weight;
     double best_weight = 26;
     int len = strlen(in);
-//    printf("                %s\n",in);
     HEXSTR temp_hex = (HEXSTR) malloc((len + 1) * sizeof(char));
     ASCSTR temp_asc = (ASCSTR) malloc((len + 1) * sizeof(char));
 
@@ -78,14 +74,9 @@ double decode_xord_hexstr(HEXSTR in, ASCSTR out)
         hexstr_to_ascstr(temp_hex, temp_asc);
         temp_weight = char_freq_weight(temp_asc);
 
-        if(temp_weight < 1)
-        {
-            //printf("%s\n", temp_asc);
-            printf("in  = %s\n key = %02x (%f) %s\nout = %s\n\n", in,c, temp_weight, temp_asc, temp_hex);
-        }
+        //printf("in  = %s\n key = %02x (%f) %s\nout = %s\n\n", in,c, temp_weight, temp_asc, temp_hex);
         if (temp_weight < best_weight)
         {
-        //    printf("NEW\n");
             strcpy(out, temp_asc);
             best_weight = temp_weight;
         }
@@ -96,8 +87,6 @@ double decode_xord_hexstr(HEXSTR in, ASCSTR out)
     return best_weight;
 }
 
-//TODO: resolve?
-//TODO: debug, doesn't return english (maybe needs better weight function)
 bool decode_xord_hexstr_file(FILE * handle, ASCSTR out)
 {
     HEXSTR line = (HEXSTR) malloc(100 * sizeof(char));
@@ -108,10 +97,8 @@ bool decode_xord_hexstr_file(FILE * handle, ASCSTR out)
     {
         REMOVE_NEWLINE(line);
         temp_weight =  decode_xord_hexstr(line, temp);
-    //    printf("(%f) %s\n",temp_weight,temp);
         if (temp_weight < best_weight)
         {
-            //printf("NEW\n");
             strcpy(out, temp);
             best_weight = temp_weight;
         }
@@ -147,7 +134,7 @@ bool challenge_main_set_1(void)
     HEXSTR xord_string = "1b37373331363f78151b7f2b783431333d78397828372d363c"
                             "78373e783a393b3736";
     decode_xord_hexstr(xord_string, temp);
-    printf("Challenge three result = \"%s\"\n", temp);
+    printf("Challenge 3 result = \"%s\"\n", temp);
     
     // Challenge 4:
     FILE * file_4;
@@ -156,9 +143,8 @@ bool challenge_main_set_1(void)
         printf("Error: File cannot be opened\n");
         return FAIL;
     }
-    //TODO: might fail due to running in wrong folder, fix!
     decode_xord_hexstr_file(file_4, temp);
-    printf("Challenge four result = \"%s\"\n", temp);
+    printf("Challenge 4 result = \"%s\"\n", temp);
     fclose(file_4);
 
 	return PASS;
