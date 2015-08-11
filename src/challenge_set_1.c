@@ -70,7 +70,7 @@ double decode_xord_hexstr(HEXSTR in, ASCSTR out)
 
     for ( c = 1; c != 0; c++)
     {
-        xor_hexstr_with_char(in, c, temp_hex);
+        xor_hexstr_with_repeatingkey(in, &c, 1, temp_hex);
         hexstr_to_ascstr(temp_hex, temp_asc);
         temp_weight = char_freq_weight(temp_asc);
 
