@@ -111,16 +111,19 @@ bool decode_xord_hexstr_file(FILE * handle, ASCSTR out)
 bool challenge_main_set_1(void)
 {
 	bool result;
-    char temp[100];
-    
+    char temp[150];
+
     // Challenge 1.
-    HEXSTR hex_string      = "49276d206b696c6c696e6720796f757220627261696e20"
-                                "6c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    B64STR base64_string   = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29"
-                                "ub3VzIG11c2hyb29t";
-    hexstr_to_b64str(hex_string, temp, 100);
-    result = (PASS == !strcmp(base64_string, temp));
-    CHECK_CHALLENGE(1, result);
+    {
+        HEXSTR hex_string      = "49276d206b696c6c696e6720796f757220627261696e20"
+                                    "6c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        B64STR base64_string   = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29"
+                                    "ub3VzIG11c2hyb29t";
+        hexstr_to_b64str(hex_string, temp, 100);
+        result = (PASS == !strcmp(base64_string, temp));
+        CHECK_CHALLENGE(1, result);
+    }
+
     
     // Challenge 2:
     {
@@ -153,7 +156,7 @@ bool challenge_main_set_1(void)
         fclose(file_4);
         printf("Challenge 4 result = \"%s\"\n", temp);
     }
-
+    
     // Challenge 5:
     {
         ASCSTR in_asc = "Burning 'em, if you ain't quick and nimble\n"
@@ -162,15 +165,13 @@ bool challenge_main_set_1(void)
                           "202d623d63343c2a26226324272765272a282b2f20"
                           "430a652e2c652a3124333a653e2b2027630c692b20"
                           "283165286326302e27282f";
-        HEXSTR temp_hex = (HEXSTR) malloc((150) * sizeof(char));
-        ascstr_to_hexstr(in_asc, temp_hex);
-        xor_hexstr_with_repeatingkey(temp_hex, "ICE", 3, temp);
-        free (temp_hex);
+        HEXSTR temphex = (HEXSTR) malloc((150) * sizeof(char));
+        ascstr_to_hexstr(in_asc, temphex);
+        xor_hexstr_with_repeatingkey(temphex, "ICE", 3, temp);
+        free (temphex);
         result = (PASS == !strcmp(expected, temp));
         CHECK_CHALLENGE(5, result);
     }
-
-
 
 	return PASS;
 }

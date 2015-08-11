@@ -12,10 +12,13 @@
 // (Private) Takes a <=15 char hex string and returns UINT64 of its value
 UINT64 _hexstr_to_int_15digits(HEXSTR in)
 {
+    UINT64 retval;
     // Fifteen hex chars carry 16^15 = 2^(60) < max_val(UINT64) values
     char* temp = calloc(16,sizeof(char));
     memcpy(temp, in, 15);
-    return (UINT64) strtoull(temp, NULL, 16);
+    retval = (UINT64) strtoull(temp, NULL, 16);
+    free (temp);
+    return retval;
 }
 
 // (Private) Take a UINT64 and translate to a base64 string (<=10 digits)
