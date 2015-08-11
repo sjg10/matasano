@@ -112,6 +112,7 @@ bool challenge_main_set_1(void)
 {
 	bool result;
     char temp[100];
+    
     // Challenge 1.
     HEXSTR hex_string      = "49276d206b696c6c696e6720796f757220627261696e20"
                                 "6c696b65206120706f69736f6e6f7573206d757368726f6f6d";
@@ -153,16 +154,20 @@ bool challenge_main_set_1(void)
         printf("Challenge 4 result = \"%s\"\n", temp);
     }
 
-
     // Challenge 5:
     {
         ASCSTR in_asc = "Burning 'em, if you ain't quick and nimble\n"
                         "I go crazy when I hear a cymbal";
-        HEXSTR temp_hex = (HEXSTR) malloc((100) * sizeof(char));
+        HEXSTR expected = "0b3637272a2b2e63622c2e69692a23693a2a3c6324"
+                          "202d623d63343c2a26226324272765272a282b2f20"
+                          "430a652e2c652a3124333a653e2b2027630c692b20"
+                          "283165286326302e27282f";
+        HEXSTR temp_hex = (HEXSTR) malloc((150) * sizeof(char));
         ascstr_to_hexstr(in_asc, temp_hex);
         xor_hexstr_with_repeatingkey(temp_hex, "ICE", 3, temp);
-        free(temp_hex);
-        printf("Challenge 5 result = \"%s\"\n", temp);
+        free (temp_hex);
+        result = (PASS == !strcmp(expected, temp));
+        CHECK_CHALLENGE(5, result);
     }
 
 
