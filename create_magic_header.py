@@ -21,7 +21,7 @@ if __name__ == "__main__":
     magic_h.write(GUARDS)
     num_challenge_sets = get_number_of_challenge_sets(matasano_h)
     for i in range(num_challenge_sets):
-        magic_h.write("bool challenge_main_set_" + str(i + 1) + "(void);\n")
+        magic_h.write("BOOL challenge_main_set_" + str(i + 1) + "(void);\n")
     magic_h.write(MAIN_DEF_INTRO)
     for i in range(num_challenge_sets):
         magic_h.write("\\\n    challenge_set_run[" + str(i) + "] = challenge_main_set_" + str(i + 1) + ";")

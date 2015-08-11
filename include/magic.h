@@ -5,7 +5,7 @@
 
 #ifndef MAGIC_H_
 #define MAGIC_H_
-bool challenge_main_set_1(void);
+BOOL challenge_main_set_1(void);
 #define setup_function_array() \
     challenge_set_run[0] = challenge_main_set_1;
 

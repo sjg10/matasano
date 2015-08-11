@@ -7,12 +7,12 @@ typedef char * HEXSTR;
 typedef char * ASCSTR;
 typedef char * B64STR;
 
-bool ascstr_to_hexstr(ASCSTR in, HEXSTR out);
-bool hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length);
-bool hexstr_to_ascstr(HEXSTR in, ASCSTR out);
+BOOL ascstr_to_hexstr(ASCSTR in, HEXSTR out);
+BOOL hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length);
+BOOL hexstr_to_ascstr(HEXSTR in, ASCSTR out);
 
-bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out);
-bool xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex);
+BOOL xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out);
+BOOL xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex);
 
 #endif
 

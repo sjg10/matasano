@@ -22,7 +22,7 @@ UINT64 _hexstr_to_int_15digits(HEXSTR in)
 }
 
 // (Private) Take a UINT64 and translate to a base64 string (<=10 digits)
-bool _int_to_b64str_10digits(UINT64 in, B64STR out)
+BOOL _int_to_b64str_10digits(UINT64 in, B64STR out)
 {
     int i, j;
     char* dict = DICTBASE64;
@@ -40,7 +40,7 @@ bool _int_to_b64str_10digits(UINT64 in, B64STR out)
 
 // Public functions:
 
-bool ascstr_to_hexstr(ASCSTR in, HEXSTR out)
+BOOL ascstr_to_hexstr(ASCSTR in, HEXSTR out)
 {
     int i;
     int len = strlen(in);
@@ -48,7 +48,7 @@ bool ascstr_to_hexstr(ASCSTR in, HEXSTR out)
     return PASS;
 }
 
-bool hexstr_to_ascstr(HEXSTR in, ASCSTR out)
+BOOL hexstr_to_ascstr(HEXSTR in, ASCSTR out)
 {
     int i;
     int len = strlen(in);
@@ -67,7 +67,7 @@ bool hexstr_to_ascstr(HEXSTR in, ASCSTR out)
 
 // Takes a hex string, returns out string in base 64
 // of length <= max_output_length
-bool hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length)
+BOOL hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length)
 {
     int i;
     int len = strlen(in);
@@ -83,7 +83,7 @@ bool hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length)
 
 // Takes an array of (number_of_inputs) hex strings of same length,
 // returns out string of same length of their xor'd value
-bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
+BOOL xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
 {
     int i, j;
     UINT64 temp_int;
@@ -138,7 +138,7 @@ bool xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
     return PASS;
 }
 
-bool xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex)
+BOOL xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex)
 {
     int i;
     int len = strlen(in);

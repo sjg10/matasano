@@ -87,7 +87,7 @@ double decode_xord_hexstr(HEXSTR in, ASCSTR out)
     return best_weight;
 }
 
-bool decode_xord_hexstr_file(FILE * handle, ASCSTR out)
+BOOL decode_xord_hexstr_file(FILE * handle, ASCSTR out)
 {
     HEXSTR line = (HEXSTR) malloc(100 * sizeof(char));
     ASCSTR temp = (HEXSTR) malloc(100 * sizeof(char));
@@ -108,9 +108,9 @@ bool decode_xord_hexstr_file(FILE * handle, ASCSTR out)
     return PASS;
 }
 
-bool challenge_main_set_1(void)
+BOOL challenge_main_set_1(void)
 {
-	bool result;
+	BOOL result;
     char temp[150];
 
     // Challenge 1.

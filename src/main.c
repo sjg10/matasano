@@ -10,7 +10,7 @@
 int main(void)
 {
 	int i;
-	bool result;
+	BOOL result;
 
 	printf("Beginning matasano tests...\n");
 	setup_function_array();

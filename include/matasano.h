@@ -37,11 +37,11 @@ typedef uint32_t UINT32;
                                     }
                                         
 
-typedef int bool;
+typedef int BOOL;
 
 // This provides the function declerations needed for the array
 // And the setup_function_array to set up the array
-bool (*challenge_set_run[NUMBER_OF_CHALLENGE_SETS])(void);
+BOOL (*challenge_set_run[NUMBER_OF_CHALLENGE_SETS])(void);
 #include "magic.h"
 
 
