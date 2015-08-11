@@ -30,10 +30,13 @@ BOOL _int_to_b64str_10digits(UINT64 in, B64STR out)
     out[10] = '\0';
 
     for(i = 9; i >= 0; i--, in >>= 6) out[i] = dict[in % 64];
-
+    
     //remove leading zeros:
     for (i = 0; out[i] == BASE64_0; i++);
-    for (j = 0; j < 10 && out[i + j - 1] != '\0'; j++) out[j] = out[i + j];
+    if (i > 0)
+    {
+        for (j = 0; j < 10 && out[i + j - 1] != '\0'; j++) {out[j] = out[i + j];}
+    }
     return PASS;
 }
 
@@ -101,6 +104,7 @@ BOOL xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
     
     // create temp_out that can include extra zero padding if (len % 16) != 0
     HEXSTR temp_out   = (HEXSTR) malloc((len + (16 - len % 16) + 1) * sizeof(char));
+    HEXSTR temp_out_two   = (HEXSTR) malloc(17 * sizeof(char));
 
     // backup the chars that we are going to zero to split up our string
     char** last_char  = (char**) malloc(number_of_inputs * sizeof(char*));
@@ -120,19 +124,21 @@ BOOL xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out)
             temp_int ^= strtoull(in_safe[j] + i, NULL, 16);
             *(last_char[j]) = temp[j];
         }
-        sprintf(temp_out + i, "%016llx", (long long int) temp_int);
+            sprintf(temp_out + i, "%016llx", (long long int) temp_int);
     }
 
     if(len % 16 != 0)
     {
         // Rewrite final block to remove leading zeros
-        strcpy(temp_out + i - 16, temp_out + i - (len % 16));
+        strcpy(temp_out_two, temp_out + i - (len % 16));
+        strcpy(temp_out + i - 16, temp_out_two);
     }
-    strcpy(out, temp_out);
+    strcpy(out,temp_out);
 
     for (i = 0; i < number_of_inputs; i++) free (in_safe[i]);
     free (in_safe);
     free (temp_out);
+    free (temp_out_two);
     free (temp);
     free (last_char);
     return PASS;
