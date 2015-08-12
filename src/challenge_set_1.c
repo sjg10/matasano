@@ -108,38 +108,51 @@ BOOL decode_xord_hexstr_file(FILE * handle, ASCSTR out)
     return PASS;
 }
 
-// TODO: think about returning best_keysize too, to use as min_weight next time to get next best
-// Or is that naughty, do you want to return all the weights in order to save time... probably.
-// You shoudl better return a sorted list of keylens by weight!
-UINT32 estimate_keysize(ASCSTR in, int min_weight, int max_keysize)
+// TODO: test, even a little bit. Also, maybe sort as we generate?
+BOOL estimate_keysize(ASCSTR in, UINT32* key_sizes, int max_keysize)
 {
-    int keysize;
-    int best_keysize = 0;
-    double best_weight = 1;
-    double temp_weight;
-    ASCSTR keylen_one = (ASCSTR) calloc((max_keysize + 1), sizeof(char));
-    ASCSTR keylen_two = (ASCSTR) calloc((max_keysize + 1), sizeof(char));
-    for (keysize = 2; keysize <= max_keysize; keysize++)
+#define MIN_KEYSIZE 2
+    int keysize, i, c, d, swap_i;
+    double swap_d;
+    ASCSTR keylen_one = (ASCSTR)  calloc((max_keysize + 1), sizeof(char));
+    ASCSTR keylen_two = (ASCSTR)  calloc((max_keysize + 1), sizeof(char));
+    double* weights   = (double*) malloc((max_keysize) * sizeof(double));
+    for (keysize = MIN_KEYSIZE; keysize <= max_keysize; keysize++)
     {
         strncpy(keylen_one, in, keysize);
         strncpy(keylen_two, in + keysize, keysize);
-        temp_weight = ascstr_hamming_distance(keylen_one, keylen_two) / keysize;
-        if (temp_weight > min_weight && temp_weight < best_weight)
-        {
-            best_keysize = keysize;
-            best_weight = temp_weight;
-        }
+        weights[keysize - MIN_KEYSIZE] = ascstr_hamming_distance(keylen_one, keylen_two) / keysize;
     }
     free (keylen_one);
     free (keylen_two);
-    return best_keysize;
+    // initialise output
+    for (i = 0; i < max_keysize - MIN_KEYSIZE; i++) key_sizes[i] = i + MIN_KEYSIZE;
+    // Now bubble sort!
+    for (c = 0 ; c < max_keysize - MIN_KEYSIZE - 1; c++)
+    {
+        for (d = 0 ; d < (max_keysize - MIN_KEYSIZE) - c - 1; d++)
+        {
+            if (weights[d] > weights[d + 1])
+            {
+                swap_i           = key_sizes[d];
+                key_sizes[d]     = key_sizes[d + 1];
+                key_sizes[d + 1] = swap_i;
+
+                swap_d           = weights[d];
+                weights[d]       = weights[d + 1];
+                weights[d + 1]   = swap_d;
+            }
+        }
+    }
+    free(weights);
+    return PASS;
 }
 
 BOOL challenge_main_set_1(void)
 {
+#if 0
 	BOOL result;
     char temp[150];
-#if 0
     // Challenge 1.
     {
         HEXSTR hex_string      = "49276d206b696c6c696e6720796f757220627261696e20"
