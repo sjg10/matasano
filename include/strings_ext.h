@@ -14,5 +14,6 @@ BOOL hexstr_to_ascstr(HEXSTR in, ASCSTR out);
 BOOL xor_hexstrs(HEXSTR* in, int number_of_inputs, HEXSTR out);
 BOOL xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out_hex);
 
+UINT32 ascstr_hamming_distance(ASCSTR in1, ASCSTR in2);
 #endif
 

@@ -40,6 +40,13 @@ BOOL _int_to_b64str_10digits(UINT64 in, B64STR out)
     return PASS;
 }
 
+UINT32 _hamming_weight(unsigned char x)
+{
+      return ((0x876543210 >>
+        (((0x4332322132212110 >> ((x & 0xF) << 2)) & 0xF) << 2)) >>
+        ((0x4332322132212110 >> (((x & 0xF0) >> 2)) & 0xF) << 2))
+        & 0xf;
+}
 
 // Public functions:
 
@@ -165,4 +172,15 @@ BOOL xor_hexstr_with_repeatingkey(HEXSTR in, ASCSTR key, int key_len, HEXSTR out
     free (key_asc);
 
     return PASS;
+}
+
+
+
+UINT32 ascstr_hamming_distance(ASCSTR in1, ASCSTR in2)
+{
+    int i;
+    int len = strlen(in1); 
+    UINT32 retval = 0;
+    for(i = 0; i < len; i++) retval += _hamming_weight(in1[i] ^ in2[i]);
+    return retval;
 }

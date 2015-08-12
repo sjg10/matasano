@@ -112,7 +112,7 @@ BOOL challenge_main_set_1(void)
 {
 	BOOL result;
     char temp[150];
-
+#if 0
     // Challenge 1.
     {
         HEXSTR hex_string      = "49276d206b696c6c696e6720796f757220627261696e20"
@@ -172,6 +172,13 @@ BOOL challenge_main_set_1(void)
         result = (PASS == !strcmp(expected, temp));
         CHECK_CHALLENGE(5, result);
     }
-
+#endif
+    //Challenge 6
+    {
+        ASCSTR in1 = "this is a test";
+        ASCSTR in2 = "wokka wokka!!!";
+        UINT32 ham = ascstr_hamming_distance(in1, in2);
+        printf("HAM: %u\n",ham);
+    }
 	return PASS;
 }
