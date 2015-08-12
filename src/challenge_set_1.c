@@ -178,7 +178,7 @@ BOOL challenge_main_set_1(void)
         ASCSTR in1 = "this is a test";
         ASCSTR in2 = "wokka wokka!!!";
         UINT32 ham = ascstr_hamming_distance(in1, in2);
-        printf("HAM: %u\n",ham);
+        ASSERT(ham == 37);
     }
 	return PASS;
 }

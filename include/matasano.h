@@ -23,6 +23,10 @@ typedef uint32_t UINT32;
 #define MIN(a,b) ( (a < b) ? (a) : (b) )
 #define MAX(a,b) ( (a > b) ? (a) : (b) )
 
+#define ASSERT(s) do {                                                         \
+    if(!(s)) { printf("ASSERT: File %s Line %u\n",__FILE__,__LINE__); exit(1); }\
+    } while(0)
+
 // Update on new challenge set to create new magic.h
 #define NUMBER_OF_CHALLENGE_SETS 1
 
