@@ -108,6 +108,33 @@ BOOL decode_xord_hexstr_file(FILE * handle, ASCSTR out)
     return PASS;
 }
 
+// TODO: think about returning best_keysize too, to use as min_weight next time to get next best
+// Or is that naughty, do you want to return all the weights in order to save time... probably.
+// You shoudl better return a sorted list of keylens by weight!
+UINT32 estimate_keysize(ASCSTR in, int min_weight, int max_keysize)
+{
+    int keysize;
+    int best_keysize = 0;
+    double best_weight = 1;
+    double temp_weight;
+    ASCSTR keylen_one = (ASCSTR) calloc((max_keysize + 1), sizeof(char));
+    ASCSTR keylen_two = (ASCSTR) calloc((max_keysize + 1), sizeof(char));
+    for (keysize = 2; keysize <= max_keysize; keysize++)
+    {
+        strncpy(keylen_one, in, keysize);
+        strncpy(keylen_two, in + keysize, keysize);
+        temp_weight = ascstr_hamming_distance(keylen_one, keylen_two) / keysize;
+        if (temp_weight > min_weight && temp_weight < best_weight)
+        {
+            best_keysize = keysize;
+            best_weight = temp_weight;
+        }
+    }
+    free (keylen_one);
+    free (keylen_two);
+    return best_keysize;
+}
+
 BOOL challenge_main_set_1(void)
 {
 	BOOL result;
