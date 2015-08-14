@@ -21,6 +21,41 @@ UINT64 _hexstr_to_int_15digits(HEXSTR in)
     return retval;
 }
 
+// (Private) Takes a b64 char and returns UINT32 of its value
+UINT32 _b64chr_to_int(char in)
+{
+    UINT32 i;
+    char* dict = DICTBASE64;
+    for (i = 0; i < 64; i++)
+    {
+        if (dict[i] == in)
+        {
+            return in;
+        }
+    }
+    ASSERT(FAIL);
+    return 0;
+}
+
+
+// (Private) Takes an == 10 digit b64 string and returns UINT64 of its value
+UINT64 _b64str_to_int_10digits(B64STR in)
+{
+    UINT64 retval, i;
+    for (i = 0; i < 10; i++)
+    {
+        retval += _b64chr_to_int(in[i]) << ((9 - i) * 4);
+    }
+    return retval;
+}
+
+// (Private) Take a UINT64 and translate to a hex string (<=15 digits)
+BOOL _int_to_hexstr_15digits(UINT64 in, HEXSTR out)
+{
+    sprintf(out, "%llx", (unsigned long long int) in);
+    return PASS;
+}
+
 // (Private) Take a UINT64 and translate to a base64 string (<=10 digits)
 BOOL _int_to_b64str_10digits(UINT64 in, B64STR out)
 {
@@ -87,6 +122,22 @@ BOOL hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length)
     {
         _int_to_b64str_10digits(_hexstr_to_int_15digits(in + i),
                                 out + ((i/15) * 10));
+    }
+    return PASS;
+}
+
+
+// TODO: test this and its called functions
+BOOL b64str_to_hexstr(B64STR in, HEXSTR out, int max_output_length)
+{
+    int i;
+    int len = strlen(in);
+    out[0]='\0';
+    // Grab all but the digits in lots of 10
+    for (i = 0; i < len; i+= 10) 
+    {
+        _int_to_hexstr_15digits(_b64str_to_int_10digits(in + i),
+                                out + ((i/10) * 15));
     }
     return PASS;
 }
