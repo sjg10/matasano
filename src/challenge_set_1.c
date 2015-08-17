@@ -122,15 +122,16 @@ BOOL estimate_keysize(ASCSTR in, UINT32* key_sizes, int max_keysize)
         strncpy(keylen_one, in, keysize);
         strncpy(keylen_two, in + keysize, keysize);
         weights[keysize - MIN_KEYSIZE] = ascstr_hamming_distance(keylen_one, keylen_two) / keysize;
+    //    printf("%u,%f\n",keysize,weights[keysize-MIN_KEYSIZE]);
     }
     free (keylen_one);
     free (keylen_two);
     // initialise output
-    for (i = 0; i < max_keysize - MIN_KEYSIZE; i++) key_sizes[i] = i + MIN_KEYSIZE;
+    for (i = 0; i <= max_keysize - MIN_KEYSIZE; i++) key_sizes[i] = i + MIN_KEYSIZE;
     // Now bubble sort!
-    for (c = 0 ; c < max_keysize - MIN_KEYSIZE - 1; c++)
+    for (c = 0 ; c <= max_keysize - MIN_KEYSIZE - 1; c++)
     {
-        for (d = 0 ; d < (max_keysize - MIN_KEYSIZE) - c - 1; d++)
+        for (d = 0 ; d <= (max_keysize - MIN_KEYSIZE) - c - 1; d++)
         {
             if (weights[d] > weights[d + 1])
             {
@@ -144,13 +145,14 @@ BOOL estimate_keysize(ASCSTR in, UINT32* key_sizes, int max_keysize)
             }
         }
     }
+    //for (i = 0; i <= max_keysize - MIN_KEYSIZE; i++) printf("%u,",key_sizes[i]);
+    //printf("\n");
     free(weights);
     return PASS;
 }
 
 BOOL challenge_main_set_1(void)
 {
-#if 0
 	BOOL result;
     char temp[150];
     // Challenge 1.
@@ -162,8 +164,14 @@ BOOL challenge_main_set_1(void)
         hexstr_to_b64str(hex_string, temp, 100);
         result = (PASS == !strcmp(base64_string, temp));
         CHECK_CHALLENGE(1, result);
+        printf("HX: %s\n",hex_string);
+        b64str_to_hexstr(base64_string, temp, 100);
+        printf("OUT: %s\n",temp);
+        result = (PASS == !strcmp(hex_string, temp));
+        CHECK_CHALLENGE(1, result);
     }
 
+#if 0
     
     // Challenge 2:
     {
@@ -219,6 +227,24 @@ BOOL challenge_main_set_1(void)
         ASCSTR in2 = "wokka wokka!!!";
         UINT32 ham = ascstr_hamming_distance(in1, in2);
         ASSERT(ham == 37);
+
+        FILE * file_6;
+        if ( (file_6 = fopen("../res/6.txt", "r")) == NULL && ((file_6 = fopen("./res/6.txt", "r")) == NULL))
+        {
+            printf("Error: File cannot be opened\n");
+            return FAIL;
+        }
+        fseek(file_6, 0L, SEEK_END);
+        UINT32 sz = ftell(file_6);
+        fseek(file_6, 0L, SEEK_SET);
+        B64STR file_str = (B64STR) malloc(sz * sizeof(char));
+        fread(file_str, sz, sizeof(char), file_6);
+        fclose(file_6);
+#define MAX_KEYSIZE 40
+        UINT32 key_sizes[MAX_KEYSIZE] = {0};
+        estimate_keysize(file_str, key_sizes, MAX_KEYSIZE);
+
+
     }
 	return PASS;
 }

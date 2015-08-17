@@ -30,7 +30,8 @@ UINT32 _b64chr_to_int(char in)
     {
         if (dict[i] == in)
         {
-            return in;
+            printf("%c to %u\n",in,i);
+            return i;
         }
     }
     ASSERT(FAIL);
@@ -38,13 +39,19 @@ UINT32 _b64chr_to_int(char in)
 }
 
 
-// (Private) Takes an == 10 digit b64 string and returns UINT64 of its value
+// (Private) Takes a <= 10 digit b64 string and returns UINT64 of its value
 UINT64 _b64str_to_int_10digits(B64STR in)
 {
-    UINT64 retval, i;
-    for (i = 0; i < 10; i++)
+    UINT64 retval = 0;
+    int i;
+    int len = MIN(strlen(in),10);
+    //printf("len: %u\n",len);
+    for (i = len - 1; i >= 0; i--)
     {
-        retval += _b64chr_to_int(in[i]) << ((9 - i) * 4);
+        printf("Position %u shift left %u\n", i, (i * 6));
+        UINT64 temp = ((UINT64) _b64chr_to_int(in[i])) << (i * 6);
+        retval+=temp;
+        printf("%c-%llu\n",in[i],(long long unsigned int) temp);
     }
     return retval;
 }
@@ -130,14 +137,18 @@ BOOL hexstr_to_b64str(HEXSTR in, B64STR out, int max_output_length)
 // TODO: test this and its called functions
 BOOL b64str_to_hexstr(B64STR in, HEXSTR out, int max_output_length)
 {
+    printf("IN %s\n",in);
     int i;
+    char temp[100];
     int len = strlen(in);
     out[0]='\0';
     // Grab all but the digits in lots of 10
     for (i = 0; i < len; i+= 10) 
     {
-        _int_to_hexstr_15digits(_b64str_to_int_10digits(in + i),
-                                out + ((i/10) * 15));
+        UINT64 tmp_int = _b64str_to_int_10digits(in + i);
+        _int_to_hexstr_15digits(tmp_int,temp);
+        printf("%llu,%s\n",(long long unsigned int) tmp_int,temp);
+        strcpy(out + ((i/10) * 15),temp);
     }
     return PASS;
 }
